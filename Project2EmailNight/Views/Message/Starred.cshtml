@@ -1,0 +1,149 @@
+﻿@model List<Project2EmailNight.Entities.Message>
+
+@{
+    ViewData["Title"] = "Yıldızlı Mesajlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mail-container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="mail-header">
+        <div class="mail-title-box">
+            <h2 class="mail-page-title">
+                ⭐ Yıldızlı Mesajlar
+                <span class="mail-count">
+                    @Model.Count
+                </span>
+            </h2>
+        </div>
+
+        <a asp-controller="Message"
+           asp-action="CreateMessage"
+           class="btn-compose">
+            + Yeni Mesaj
+        </a>
+    </div>
+
+    <div class="mail-box">
+
+        <!-- ===== TOOLBAR ===== -->
+        <div class="mail-toolbar">
+            <div class="toolbar-left">
+
+                <input type="checkbox"
+                       id="checkAll"
+                       title="Tümünü Seç" />
+
+                <button type="button"
+                        id="btnRefresh"
+                        class="icon-btn"
+                        title="Yenile">
+                    <i class="bx bx-refresh"></i>
+                </button>
+
+                <button type="button"
+                        id="btnDelete"
+                        class="icon-btn"
+                        title="Seçilenleri Sil">
+                    <i class="bx bx-trash"></i>
+                </button>
+
+                <div class="toolbar-search">
+                    <i class="bx bx-search"></i>
+                    <input type="text"
+                           id="searchInput"
+                           placeholder="Yıldızlılarda ara..." />
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== EMPTY ===== -->
+        @if (!Model.Any())
+        {
+            <div class="mail-empty">
+                ⭐ Henüz yıldızlı mesajın yok.
+                <br />
+                Önemli gördüğün mesajları yıldızlayarak burada saklayabilirsin.
+            </div>
+        }
+        else
+        {
+            <table class="mail-table">
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        var plainText = System.Text.RegularExpressions.Regex
+                        .Replace(item.MessageDetail ?? "", "<.*?>", "");
+
+                        <tr class="mail-row @(item.IsRead ? "" : "unread")"
+                            data-id="@item.MessageId">
+
+                            <!-- CHECK -->
+                            <td class="col-check">
+                                <input type="checkbox"
+                                       class="mail-check"
+                                       value="@item.MessageId"
+                                       onclick="event.stopPropagation();" />
+                            </td>
+
+                            <!-- STAR -->
+                            <td class="col-star">
+                                <i class="bx bxs-star star-active star-btn"
+                                   title="Yıldızı Kaldır"
+                                   onclick="event.stopPropagation();"></i>
+                            </td>
+
+                            <!-- SENDER -->
+                            <td class="col-sender">
+                                @item.SenderEmail
+                            </td>
+
+                            <!-- CONTENT -->
+                            <td class="col-content">
+
+                                <span class="mail-subject">
+                                    @item.Subject
+                                </span>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Category))
+                                {
+                                    <span class="mail-badge">
+                                        @item.Category
+                                    </span>
+                                }
+
+                                <span class="mail-preview">
+                                    — @(plainText.Length > 120
+                                                                ? plainText.Substring(0, 120) + "..."
+                                                                : plainText)
+                                </span>
+
+                            </td>
+
+                            <!-- DATE -->
+                            <td class="col-date">
+                                @item.SendDate.ToString("dd MMM")
+                            </td>
+
+                            <!-- DETAIL -->
+                            <td class="col-delete">
+                                <a href="/Message/MessageDetail/@item.MessageId"
+                                   class="icon-btn"
+                                   title="Mesajı Görüntüle"
+                                   onclick="event.stopPropagation();">
+                                    <i class="bx bx-show"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+
+    </div>
+</div>

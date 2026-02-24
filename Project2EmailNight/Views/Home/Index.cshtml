@@ -1,0 +1,178 @@
+﻿@model List<Project2EmailNight.Entities.Message>
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mail-container">
+
+    <!-- HEADER -->
+    <div class="mail-header mb-4">
+        <div class="dashboard-title-wrapper">
+            <h2 class="dashboard-title">📊 Dashboard</h2>
+        </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="row g-4 mb-4">
+
+
+        @{
+            var stats = new[]
+            {
+                new { Title="Gelen", Count=ViewBag.InboxCount, Icon="bx-envelope", Color="#7c3aed", Url="/Message/Inbox" },
+                new { Title="Gönderilen", Count=ViewBag.SendCount, Icon="bx-send", Color="#10b981", Url="/Message/Sendbox" },
+                new { Title="Taslak", Count=ViewBag.DraftCount, Icon="bx-edit", Color="#3b82f6", Url="/Message/Draft" },
+                new { Title="Yıldızlı", Count=ViewBag.StarCount, Icon="bx-star", Color="#f59e0b", Url="/Message/Starred" },
+                new { Title="Çöp", Count=ViewBag.TrashCount, Icon="bx-trash", Color="#ef4444", Url="/Message/Trash" },
+                new { Title="Okunmamış", Count=ViewBag.UnreadCount, Icon="bx-envelope-open", Color="#ec4899", Url="/Message/Inbox" },
+                new { Title="Bugünkü Gelen", Count=ViewBag.TodayInboxCount, Icon="bx-calendar", Color="#6366f1", Url="/Message/Inbox" },
+                new { Title="Son 7 Gün", Count=ViewBag.Last7DaysTotal, Icon="bx-trending-up", Color="#14b8a6", Url="/Message/Inbox" }
+                };
+        }
+
+        @foreach (var s in stats)
+        {
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                <div class="dash-card" onclick="location.href='@s.Url'">
+                    <div class="dash-icon"
+                         style="background:@(s.Color + "20"); color:@s.Color">
+                        <i class="bx @s.Icon"></i>
+                    </div>
+
+                    <div>
+                        <div class="dash-title">@s.Title</div>
+                        <div class="dash-count">@s.Count</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- CHARTS -->
+    <div class="row g-4 mb-4 align-items-stretch">
+
+        <div class="col-lg-8">
+            <div class="dash-panel">
+                <h5>Son 7 Gün Gelen Mesaj</h5>
+                <div class="chart-wrapper">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="dash-panel">
+                <h5>Klasör Dağılımı</h5>
+                <div class="chart-wrapper">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- UNREAD -->
+    <div class="dash-panel">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+                Okunmamış Mesajlar
+                <span class="unread-badge">(@ViewBag.UnreadCount)</span>
+            </h5>
+
+            <a href="/Message/Inbox" class="text-decoration-none small text-primary">
+                Tümünü Gör →
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-muted py-4 text-center">
+                Okunmamış mesaj yok 🎉
+            </div>
+        }
+        else
+        {
+            <div class="unread-list">
+                @foreach (var item in Model)
+                {
+                    <div class="unread-item"
+                         onclick="location.href='/Message/MessageDetail/@item.MessageId'">
+
+                        <div class="unread-left">
+                            <div class="unread-dot"></div>
+                            <div>
+                                <div class="unread-sender">@item.SenderEmail</div>
+                                <div class="unread-subject">@item.Subject</div>
+                            </div>
+                        </div>
+
+                        <div class="unread-date">
+                            @item.SendDate.ToString("dd MMM")
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+@section Scripts {
+
+    <script>
+        const primary = "#7c3aed";
+        const secondary = "#10b981";
+
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Last7DaysLabels)),
+                datasets: [{
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Last7DaysCounts)),
+                    borderColor: primary,
+                    backgroundColor: primary + "22",
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+                plugins:{ legend:{ display:false } }
+            }
+        });
+
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Gelen','Gönderilen','Taslak','Yıldızlı','Çöp'],
+                datasets: [{
+                    data: [
+                        @ViewBag.InboxCount,
+                        @ViewBag.SendCount,
+                        @ViewBag.DraftCount,
+                        @ViewBag.StarCount,
+                        @ViewBag.TrashCount
+                    ],
+                    backgroundColor: [
+                        primary,
+                        secondary,
+                        "#3b82f6",
+                        "#f59e0b",
+                        "#ef4444"
+                    ]
+                }]
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false
+            }
+        });
+    </script>
+
+}

@@ -1,0 +1,279 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Project2EmailNight.Entities
+@inject UserManager<AppUser> UserManager
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Mail@@</title>
+
+    <!-- PLUGINS CSS -->
+    <link href="~/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" asp-append-version="true" />
+
+    <!-- CORE CSS -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/assets/css/icons.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/assets/css/app.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/assets/css/dark-sidebar.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/assets/css/dark-theme.css" rel="stylesheet" asp-append-version="true" />
+
+    <!-- MODERN MAIL -->
+    <link href="~/css/modern-mail.css" rel="stylesheet" asp-append-version="true" />
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <style>
+        ul.metismenu li, ul.navbar-nav li {
+            list-style: none !important;
+        }
+
+        .menu-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            opacity: .6;
+            padding: 15px 20px 5px;
+        }
+
+        .category-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: .2s;
+        }
+
+            .category-link:hover {
+                background: rgba(124,58,237,.1);
+            }
+
+        .category-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .category-count {
+            font-size: 11px;
+            background: rgba(255,255,255,.15);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .active-category {
+            background: rgba(124,58,237,.2);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255,255,255,.15);
+            margin: 15px 0;
+        }
+
+        /* HEADER FIX */
+        .top-header {
+            position: fixed;
+            left: 260px;
+            right: 0;
+            top: 0;
+            height: 70px;
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px !important;
+            background: #ffffff;
+            z-index: 1000;
+        }
+
+        .page-wrapper {
+            margin-top: 70px !important;
+        }
+
+        .top-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+            .profile-link:hover {
+                opacity: .8;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar-wrapper" data-simplebar="true">
+            <div class="sidebar-header d-flex align-items-center gap-3">
+                <div class="brand-icon">
+                    <i class="bx bxs-paper-plane"></i>
+                </div>
+                <div>
+                    <h4 class="logo-text m-0">Mail@@</h4>
+                </div>
+            </div>
+
+            <ul class="metismenu" id="menu">
+
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="bx bx-grid-alt"></i>
+                        <div class="menu-title">Dashboard</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Message" asp-action="Inbox">
+                        <i class="bx bx-envelope"></i>
+                        <div class="menu-title">Gelen Kutusu</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Message" asp-action="Starred">
+                        <i class="bx bx-star"></i>
+                        <div class="menu-title">Yıldızlılar</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Message" asp-action="Sendbox">
+                        <i class="bx bx-paper-plane"></i>
+                        <div class="menu-title">Gönderilenler</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Message" asp-action="Draft">
+                        <i class="bx bx-edit-alt"></i>
+                        <div class="menu-title">Taslaklar</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Message" asp-action="Trash">
+                        <i class="bx bx-trash"></i>
+                        <div class="menu-title">Silinenler</div>
+                    </a>
+                </li>
+
+                @{
+                    var categories = ViewBag.Categories;
+                    var activeCategory = ViewBag.ActiveCategory as string;
+                    var colors = new[] { "#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4" };
+                    int i = 0;
+                }
+
+                @if (categories != null)
+                {
+                    <li class="menu-label">Etiketler</li>
+
+                    foreach (var item in categories)
+                    {
+                        var color = colors[i % colors.Length];
+                        i++;
+
+                        <li>
+                            <a asp-controller="Message"
+                               asp-action="Category"
+                               asp-route-name="@item.Name"
+                               class="category-link @(activeCategory == item.Name ? "active-category" : "")">
+
+                                <div style="display:flex;align-items:center;">
+                                    <span class="category-dot" style="background:@color"></span>
+                                    <span>@item.Name</span>
+                                </div>
+
+                                <span class="category-count">@item.Count</span>
+                            </a>
+                        </li>
+                    }
+                }
+
+                <div class="sidebar-divider"></div>
+
+                <li>
+                    <a asp-controller="Profile" asp-action="Index">
+                        <i class="bx bx-user-circle"></i>
+                        <div class="menu-title">Profil</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Login" asp-action="Logout">
+                        <i class="bx bx-log-out"></i>
+                        <div class="menu-title text-danger">Çıkış Yap</div>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        @{
+            var currentUser = await UserManager.GetUserAsync(User);
+            var fullName = currentUser != null ? $"{currentUser.Name} {currentUser.Surname}" : "Kullanıcı";
+            var profileImage = string.IsNullOrWhiteSpace(currentUser?.ImageUrl)
+            ? "/images/default-avatar.png"
+            : currentUser.ImageUrl;
+        }
+
+        <header class="top-header">
+
+            <div class="mobile-toggle-menu">
+                <i class='bx bx-menu toggle-btn'></i>
+            </div>
+
+            <div class="top-menu">
+                <a asp-controller="Profile" asp-action="Index" class="profile-link">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="fw-semibold text-dark">
+                            @fullName
+                        </span>
+
+                        <img src="@profileImage"
+                             class="rounded-circle"
+                             style="width:40px;height:40px;object-fit:cover;border:2px solid #7c3aed;padding:2px;background:#fff;" />
+                    </div>
+                </a>
+            </div>
+
+        </header>
+
+        <div class="page-wrapper">
+            <div class="page-content-wrapper">
+                <div class="page-content">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer text-center">
+            © 2026 Mail@@— Mail Sistemi
+        </footer>
+
+    </div>
+
+    <!-- JS -->
+    <script src="~/assets/js/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/assets/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/simplebar/js/simplebar.min.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/metismenu/js/metisMenu.min.js" asp-append-version="true"></script>
+    <script src="~/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" asp-append-version="true"></script>
+    <script src="~/assets/js/app.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

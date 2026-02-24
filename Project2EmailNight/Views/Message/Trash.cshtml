@@ -1,0 +1,159 @@
+﻿@model List<Project2EmailNight.Entities.Message>
+
+@{
+    ViewData["Title"] = "Silinenler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mail-container">
+
+    <!-- HEADER -->
+    <div class="mail-header">
+        <div class="mail-title-box trash-title">
+            <h2 class="mail-page-title trash-small-title">
+                🗑️ Silinenler
+                <span class="mail-count">
+                    @(Model?.Count ?? 0)
+                </span>
+            </h2>
+        </div>
+
+        @if (Model.Any())
+        {
+            <a asp-action="EmptyTrash"
+               class="btn-empty-trash"
+               data-bs-toggle="tooltip"
+               title="Tüm mesajları kalıcı olarak sil">
+                Çöp Kutusunu Boşalt
+            </a>
+        }
+    </div>
+
+    <div class="mail-box">
+
+        @if (!Model.Any())
+        {
+            <div class="mail-empty">
+                🗑️ Çöp kutusu boş.
+            </div>
+        }
+        else
+        {
+            <!-- TOOLBAR -->
+            <div class="mail-toolbar">
+                <div class="toolbar-left">
+                    <div class="toolbar-search">
+                        <i class="bx bx-search"></i>
+                        <input type="text"
+                               id="trashSearch"
+                               placeholder="Silinenlerde ara..." />
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIST -->
+            <div class="mail-list" id="trashList">
+
+                @foreach (var item in Model)
+                {
+                    var plainText = System.Text.RegularExpressions.Regex
+                    .Replace(item.MessageDetail ?? "", "<.*?>", "");
+
+                    <div class="mail-row trash-row"
+                         onclick="location.href='/Message/MessageDetail/@item.MessageId'">
+
+                        <div class="col-check">
+                            <i class="bx bx-trash trash-icon"
+                               data-bs-toggle="tooltip"
+                               title="Silinmiş mesaj"></i>
+                        </div>
+
+                        <div class="col-star"></div>
+
+                        <div class="col-sender muted">
+                            @item.SenderEmail
+                        </div>
+
+                        <div class="col-content">
+
+                            <span class="mail-subject muted">
+                                @item.Subject
+                            </span>
+
+                            @if (!string.IsNullOrWhiteSpace(item.Category))
+                            {
+                                <span class="mail-badge">
+                                    @item.Category
+                                </span>
+                            }
+
+                            <span class="mail-preview">
+                                — @(plainText.Length > 70
+                                                        ? plainText.Substring(0, 70) + "..."
+                                                        : plainText)
+                            </span>
+
+                        </div>
+
+                        <div class="col-date">
+                            @item.SendDate.ToString("dd MMM")
+                        </div>
+
+                        <div class="col-actions">
+
+                            <a href="/Message/Restore/@item.MessageId"
+                               class="icon-btn restore-btn"
+                               onclick="event.stopPropagation(); return confirm('Mesaj geri yüklensin mi?')"
+                               data-bs-toggle="tooltip"
+                               title="Geri yükle">
+                                <i class="bx bx-undo"></i>
+                            </a>
+
+                            <a href="/Message/HardDelete/@item.MessageId"
+                               class="icon-btn hard-delete-btn"
+                               onclick="event.stopPropagation(); return confirm('Mesaj kalıcı silinsin mi?')"
+                               data-bs-toggle="tooltip"
+                               title="Kalıcı sil">
+                                <i class="bx bx-x"></i>
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+</div>
+
+<style>
+    /* GERÇEKTEN küçültülmüş başlık */
+    .trash-small-title {
+        font-size: 15px !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+
+        document.getElementById("trashSearch")?.addEventListener("keyup", function () {
+            const value = this.value.toLowerCase();
+            document.querySelectorAll("#trashList .mail-row").forEach(row => {
+                row.style.display =
+                    row.innerText.toLowerCase().includes(value) ? "grid" : "none";
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var tooltipTriggerList =
+                [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        });
+
+    </script>
+}

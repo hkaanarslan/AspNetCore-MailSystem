@@ -1,0 +1,157 @@
+﻿@model List<Project2EmailNight.Entities.Message>
+
+@{
+    ViewData["Title"] = "Taslaklar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mail-container">
+
+    <!-- ===== HEADER (Inbox ile aynı yapı) ===== -->
+    <div class="mail-header">
+        <div class="mail-title-box">
+            <h2 class="mail-page-title">
+                📝 Taslaklar
+                <span class="mail-count">
+                    @(Model?.Count ?? 0)
+                </span>
+            </h2>
+        </div>
+
+        <a asp-controller="Message"
+           asp-action="CreateMessage"
+           class="btn-compose">
+            + Yeni Mesaj
+        </a>
+    </div>
+
+    <div class="mail-box">
+
+        @if (!Model.Any())
+        {
+            <div class="mail-empty">
+                📝 Henüz taslak mesajın yok.
+            </div>
+        }
+        else
+        {
+            <!-- ===== TOOLBAR ===== -->
+            <div class="mail-toolbar">
+                <div class="toolbar-left">
+
+                    <input type="checkbox"
+                           id="checkAll"
+                           title="Tümünü Seç" />
+
+                    <button id="btnRefresh"
+                            class="icon-btn"
+                            title="Taslakları yenile">
+                        <i class="bx bx-refresh"></i>
+                    </button>
+
+                    <button id="btnDelete"
+                            class="icon-btn"
+                            title="Seçili taslakları sil">
+                        <i class="bx bx-trash"></i>
+                    </button>
+
+                    <div class="toolbar-search">
+                        <i class="bx bx-search"></i>
+                        <input type="text"
+                               id="draftSearch"
+                               placeholder="Taslaklarda ara..." />
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ===== LIST ===== -->
+            <div class="mail-list" id="draftList">
+
+                @foreach (var item in Model)
+                {
+                    var plainText = System.Text.RegularExpressions.Regex
+                    .Replace(item.MessageDetail ?? "", "<.*?>", "");
+
+                    <div class="mail-row draft-row"
+                         onclick="location.href='@Url.Action("EditDraft", "Message", new { id = item.MessageId })'">
+
+                        <!-- CHECK -->
+                        <div class="col-check">
+                            <input type="checkbox"
+                                   class="mail-check"
+                                   value="@item.MessageId"
+                                   onclick="event.stopPropagation();" />
+                        </div>
+
+                        <!-- RECEIVER -->
+                        <div class="col-sender">
+                            @item.ReceiverEmail
+                        </div>
+
+                        <!-- CONTENT -->
+                        <div class="col-content">
+                            <span class="mail-subject">
+                                @item.Subject
+                            </span>
+
+                            <span class="mail-preview">
+                                — @(plainText.Length > 70
+                                                        ? plainText.Substring(0, 70) + "..."
+                                                        : plainText)
+                            </span>
+                        </div>
+
+                        <!-- DATE -->
+                        <div class="col-date">
+                            @item.SendDate.ToString("dd MMM")
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="col-actions">
+
+                            <!-- EDIT -->
+                            <a asp-controller="Message"
+                               asp-action="EditDraft"
+                               asp-route-id="@item.MessageId"
+                               class="icon-btn"
+                               onclick="event.stopPropagation();"
+                               title="Taslağı düzenle">
+                                <i class="bx bx-edit"></i>
+                            </a>
+
+                            <!-- DELETE -->
+                            <a asp-controller="Message"
+                               asp-action="MessageDelete"
+                               asp-route-id="@item.MessageId"
+                               class="icon-btn"
+                               onclick="event.stopPropagation(); return confirm('Taslak silinsin mi?')"
+                               title="Taslağı sil">
+                                <i class="bx bx-trash"></i>
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // LIVE SEARCH
+        document.getElementById("draftSearch")?.addEventListener("keyup", function () {
+            const value = this.value.toLowerCase();
+            document.querySelectorAll("#draftList .mail-row").forEach(row => {
+                row.style.display =
+                    row.innerText.toLowerCase().includes(value)
+                        ? "grid"
+                        : "none";
+            });
+        });
+    </script>
+}

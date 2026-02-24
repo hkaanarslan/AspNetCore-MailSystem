@@ -1,0 +1,165 @@
+﻿@model List<Project2EmailNight.Entities.Message>
+
+@{
+    var activeCategory = ViewBag.ActiveCategory as string;
+    ViewData["Title"] = activeCategory != null
+        ? activeCategory + " - Gelen Kutusu"
+        : "Gelen Kutusu";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mail-container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="mail-header">
+
+        <div class="mail-title-box">
+            <h2 class="mail-page-title">
+
+                @if (!string.IsNullOrEmpty(activeCategory))
+                {
+                    <span>🏷️ @activeCategory</span>
+                }
+                else
+                {
+                    <span>📥 Gelen Kutusu</span>
+                }
+
+                <span class="mail-count">
+                    @(Model?.Count ?? 0)
+                </span>
+
+            </h2>
+        </div>
+
+        <a asp-controller="Message"
+           asp-action="CreateMessage"
+           class="btn-compose">
+            + Yeni Mesaj
+        </a>
+
+    </div>
+
+    <div class="mail-box">
+
+        <!-- TOOLBAR -->
+        <div class="mail-toolbar">
+            <div class="toolbar-left">
+
+                <input type="checkbox" id="checkAll" title="Tümünü Seç" />
+
+                <button type="button"
+                        id="btnRefresh"
+                        class="icon-btn"
+                        title="Yenile">
+                    <i class="bx bx-refresh"></i>
+                </button>
+
+                <button type="button"
+                        id="btnDelete"
+                        class="icon-btn"
+                        title="Seçilenleri Sil">
+                    <i class="bx bx-trash"></i>
+                </button>
+
+                <div class="toolbar-search">
+                    <i class="bx bx-search"></i>
+                    <input type="text"
+                           id="searchInput"
+                           placeholder="Mail ara..." />
+                </div>
+
+            </div>
+        </div>
+
+        <!-- EMPTY -->
+        @if (!Model.Any())
+        {
+            <div class="mail-empty">
+                📭 Mesaj bulunamadı.
+            </div>
+        }
+        else
+        {
+            <table class="mail-table">
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        var plainText = System.Text.RegularExpressions.Regex
+                        .Replace(item.MessageDetail ?? "", "<.*?>", "");
+
+                        <tr class="mail-row @(item.IsRead ? "" : "unread")"
+                            data-id="@item.MessageId"
+                            onclick="window.location='/Message/MessageDetail/@item.MessageId'">
+
+                            <!-- CHECKBOX -->
+                            <td class="col-check">
+                                <input type="checkbox"
+                                       class="mail-check"
+                                       value="@item.MessageId"
+                                       onclick="event.stopPropagation();" />
+                            </td>
+
+                            <!-- ⭐ STAR -->
+                            <td class="col-star">
+                                <i class="bx @(item.IsStarred ? "bxs-star star-active" : "bx-star") star-btn"
+                                   onclick="event.stopPropagation();">
+                                </i>
+                            </td>
+
+                            <!-- SENDER -->
+                            <td class="col-sender">
+                                @item.SenderEmail
+                            </td>
+
+                            <!-- CONTENT -->
+                            <td class="col-content">
+
+                                <span class="mail-subject">
+                                    @item.Subject
+                                </span>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Category))
+                                {
+                                    <span class="mail-badge">
+                                        @item.Category
+                                    </span>
+                                }
+
+                                <span class="mail-preview">
+                                    — @(plainText.Length > 120
+                                                                ? plainText.Substring(0, 120) + "..."
+                                                                : plainText)
+                                </span>
+
+                            </td>
+
+                            <!-- DATE -->
+                            <td class="col-date">
+                                @item.SendDate.ToString("dd MMM")
+                            </td>
+
+                            <!-- DELETE -->
+                            <td class="col-delete">
+                                <button type="button"
+                                        class="icon-btn"
+                                        onclick="event.stopPropagation();
+                                             window.location.href='/Message/MessageDelete/@item.MessageId';">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+
+    </div>
+</div>
+
+
+

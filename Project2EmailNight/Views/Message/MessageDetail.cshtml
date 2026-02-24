@@ -1,0 +1,208 @@
+﻿@model Project2EmailNight.Entities.Message
+
+@{
+    ViewData["Title"] = "Mesaj Detayı";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var backUrl = Model.SenderEmail == User.Identity.Name
+        ? "/Message/Sendbox"
+        : "/Message/Inbox";
+}
+
+<div class="message-card">
+
+    <!-- ===== ACTION BAR ===== -->
+    <div class="mail-action-bar">
+
+        <!-- SOL -->
+        <div class="action-left modern-left-group">
+
+            <a href="@backUrl" class="action-btn">
+                <i class="bx bx-arrow-back"></i> Geri Dön
+            </a>
+
+            <!-- MODERN CATEGORY BOX -->
+            <form method="post"
+                  asp-action="UpdateCategory"
+                  class="category-box">
+
+                <input type="hidden" name="id" value="@Model.MessageId" />
+
+                <div class="category-inner">
+
+                    <i class="bx bx-purchase-tag"></i>
+
+                    <input list="categories"
+                           name="category"
+                           value="@Model.Category"
+                           placeholder="Etiket ekle..."
+                           class="category-input" />
+
+                    <button type="submit">
+                        Kaydet
+                    </button>
+
+                </div>
+
+                <datalist id="categories">
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var cat in ViewBag.Categories)
+                        {
+                            <option value="@cat.Name"></option>
+                        }
+                    }
+                </datalist>
+
+            </form>
+
+        </div>
+
+        <!-- SAĞ -->
+        <div class="action-right">
+
+            <a asp-controller="Message"
+               asp-action="Reply"
+               asp-route-id="@Model.MessageId"
+               class="action-btn">
+                <i class="bx bx-reply"></i> Yanıtla
+            </a>
+
+           
+
+            <a href="/Message/MessageDelete/@Model.MessageId"
+               class="action-btn danger"
+               onclick="return confirm('Mesaj silinsin mi?')">
+                <i class="bx bx-trash"></i> Sil
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- SUBJECT -->
+    <div class="msg-detail-title-box">
+
+        <div class="subject-group">
+
+            <h1 class="msg-detail-subject">
+                @Model.Subject
+            </h1>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Category))
+            {
+                <span class="mail-badge">
+                    @Model.Category
+                </span>
+            }
+
+        </div>
+
+        <button id="starBtn"
+                class="star-btn @(Model.IsStarred ? "active" : "")"
+                data-id="@Model.MessageId">
+            <i class="bx @(Model.IsStarred ? "bxs-star" : "bx-star")"></i>
+        </button>
+
+    </div>
+
+    <!-- META -->
+    <div class="msg-header">
+        <div class="msg-meta">
+            <div class="msg-avatar">
+                @(Model.SenderEmail?.Substring(0, 1).ToUpper())
+            </div>
+
+            <div class="meta-info">
+                <h5>@Model.SenderEmail</h5>
+                <span>
+                    Alıcı: @Model.ReceiverEmail •
+                    @Model.SendDate.ToString("dd MMM yyyy HH:mm")
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="msg-body">
+        @Html.Raw(Model.MessageDetail)
+    </div>
+
+</div>
+
+<style>
+
+    /* SOL GROUP */
+    .modern-left-group {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    /* CATEGORY BOX */
+    .category-box {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 6px 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    }
+
+    /* INNER FLEX */
+    .category-inner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        /* ICON */
+        .category-inner i {
+            color: #7c3aed;
+            font-size: 18px;
+        }
+
+    /* INPUT */
+    .category-input {
+        border: none;
+        outline: none;
+        font-size: 14px;
+        width: 140px;
+    }
+
+    /* BUTTON */
+    .category-inner button {
+        background: #7c3aed;
+        color: #fff;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        transition: .2s;
+    }
+
+        .category-inner button:hover {
+            background: #6d28d9;
+        }
+
+</style>
+
+@section Scripts {
+    <script>
+        document.getElementById("starBtn")?.addEventListener("click", async function () {
+
+            const id = this.dataset.id;
+
+            const res = await fetch("/Message/ToggleStar/" + id, {
+                method: "POST"
+            });
+
+            if (!res.ok) return;
+
+            this.classList.toggle("active");
+
+            const icon = this.querySelector("i");
+            icon.classList.toggle("bxs-star");
+            icon.classList.toggle("bx-star");
+        });
+    </script>
+}

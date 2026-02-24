@@ -1,0 +1,161 @@
+﻿@model Project2EmailNight.Dtos.UserEditDto
+@{
+    ViewData["Title"] = "Profil Güncelle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mail-settings-wrapper edit-page-wrapper">
+
+    <div class="mail-header">
+        <div class="mail-title-box">
+            <i class="bx bx-edit-alt" style="font-size: 20px;"></i>
+            <h2 class="mail-page-title">Profili Düzenle</h2>
+        </div>
+        <div class="header-actions">
+            <a href="/Profile/Index" class="btn-outline-action">
+                <i class="bx bx-arrow-back"></i> İptal ve Geri Dön
+            </a>
+        </div>
+    </div>
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         style="font-size:14px;">
+    </div>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+        <div class="edit-layout-stack">
+
+            <!-- TEMEL BİLGİLER -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4><i class="bx bx-user-circle"></i> Temel Bilgiler</h4>
+                </div>
+                <div class="section-body">
+
+                    <div class="photo-edit-area">
+                        <img id="previewImage"
+                             src="@(string.IsNullOrEmpty(Model?.ImageUrl) ? "/images/default-avatar.png" : Model.ImageUrl)"
+                             class="profile-img-preview" />
+
+                        <label class="btn-upload-outline">
+                            <i class="bx bx-upload"></i> Fotoğraf Seç
+                            <input asp-for="Image" type="file"
+                                   accept="image/*"
+                                   hidden
+                                   onchange="previewImage(this)" />
+                        </label>
+                    </div>
+
+                    <div class="form-grid-2col">
+                        <div class="form-group">
+                            <label>Ad</label>
+                            <input asp-for="Name" class="form-control-pro" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Soyad</label>
+                            <input asp-for="Surname" class="form-control-pro" />
+                            <span asp-validation-for="Surname" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>E-posta</label>
+                            <input asp-for="Email" class="form-control-pro" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Telefon</label>
+                            <input asp-for="Phone" class="form-control-pro" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Doğum Tarihi</label>
+                            <input asp-for="BirthDate" type="date" class="form-control-pro" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Şehir</label>
+                            <input asp-for="City" class="form-control-pro" />
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label>Hakkında</label>
+                        <textarea asp-for="About"
+                                  rows="4"
+                                  class="form-control-pro"></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ŞİFRE -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4><i class="bx bx-lock-alt"></i> Şifre Değiştirme</h4>
+                </div>
+                <div class="section-body">
+
+                    <div class="alert alert-info">
+                        Şifre değiştirmek istemiyorsanız boş bırakabilirsiniz.
+                    </div>
+
+                    <div class="form-grid-3col">
+
+                        <div class="form-group">
+                            <label>Mevcut Şifre</label>
+                            <input type="password"
+                                   name="OldPassword"
+                                   class="form-control-pro" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Yeni Şifre</label>
+                            <input asp-for="Password"
+                                   type="password"
+                                   class="form-control-pro" />
+                            <span asp-validation-for="Password"
+
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Yeni Şifre (Tekrar)</label>
+                            <input type="password"
+                                   name="ConfirmPassword"
+                                   class="form-control-pro" />
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-submit-area">
+                <button type="submit"
+                        class="btn-compose btn-save-large">
+                    <i class="bx bx-check-double"></i> Kaydet
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(input){
+            if(input.files && input.files[0]){
+                const reader = new FileReader();
+                reader.onload = e =>
+                    document.getElementById("previewImage").src = e.target.result;
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

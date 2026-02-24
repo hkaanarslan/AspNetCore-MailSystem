@@ -1,0 +1,310 @@
+﻿@model Project2EmailNight.Dtos.UserLoginDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mail@@ | Giriş Yap</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #7c3aed; /* Profildeki mor tonu [cite: 52, 53] */
+            --secondary: #10b981; /* Profildeki yeşil tonu [cite: 54] */
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b; /* [cite: 55] */
+            --border: #e5e7eb;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif; /* [cite: 56] */
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #ede9fe, #f6f7fb); /* [cite: 57] */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--card);
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(15, 23, 42, 0.08); /* Yeni yumuşak gölge */
+        }
+
+        /* YENİ NESİL SOL TARAF (AYDINLIK TEMA) */
+        .brand-side {
+            position: relative;
+            background-color: #f8fafc;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+            /* Mesh Gradient - Pastel Animasyonlu Küreler */
+            .brand-side::before,
+            .brand-side::after {
+                content: '';
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(60px);
+                z-index: -1;
+                animation: float 10s infinite ease-in-out alternate;
+            }
+
+            .brand-side::before {
+                top: -10%;
+                left: -10%;
+                width: 350px;
+                height: 350px;
+                background: rgba(124, 58, 237, 0.35);
+            }
+
+            .brand-side::after {
+                bottom: -10%;
+                right: -10%;
+                width: 300px;
+                height: 300px;
+                background: rgba(16, 185, 129, 0.25);
+                animation-delay: -5s;
+            }
+
+        @@keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(20px, 20px) scale(1.1);
+            }
+        }
+
+        /* Aydınlık Glassmorphism İçerik Kartı */
+        .brand-content {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: var(--primary);
+            display: inline-block;
+        }
+
+        .brand-title {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            color: var(--text);
+        }
+
+        .brand-desc {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* FORM TARAFI (Sağ Kısım) */
+        .form-side {
+            padding: 70px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--card);
+        }
+
+        .form-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .form-subtitle {
+            font-size: 15px;
+            color: var(--muted);
+            margin-bottom: 35px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            background: #f8fafc;
+            transition: all .25s ease;
+        }
+
+            .form-control:focus {
+                background: #ffffff;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+                outline: none;
+            }
+
+        .btn-login {
+            width: 100%;
+            border-radius: 16px;
+            padding: 15px;
+            font-weight: 700;
+            font-size: 15px;
+            background: var(--primary); /* Temiz ve net mor buton */
+            border: none;
+            color: white;
+            transition: all .25s ease;
+            margin-top: 10px;
+        }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 30px rgba(124, 58, 237, 0.25);
+                background: #6d28d9;
+            }
+
+        .validation-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin-top: 16px;
+            font-weight: 500;
+        }
+
+            .validation-box::before {
+                content: "⚠️ Lütfen dikkat:";
+                display: block;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+
+        .register-link {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 14.5px;
+            color: var(--muted);
+        }
+
+            .register-link a {
+                color: var(--primary);
+                font-weight: 700;
+                text-decoration: none;
+                transition: all 0.2s;
+                margin-left: 4px;
+            }
+
+                .register-link a:hover {
+                    color: #5b21b6;
+                    text-decoration: underline;
+                }
+
+        /* RESPONSIVE TASARIM */
+        @@media (max-width: 992px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-side {
+                padding: 40px 20px;
+            }
+
+            .brand-content {
+                padding: 30px;
+                text-align: center;
+            }
+
+            .form-side {
+                padding: 45px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+
+        <div class="brand-side">
+            <div class="brand-content">
+                <div class="logo">Mail@@</div>
+                <div class="brand-title">Tekrar hoş geldin.</div>
+                <div class="brand-desc">
+                    Hesabına giriş yaparak güvenli mail deneyimine kaldığın yerden devam edebilirsin.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-side">
+            <div class="form-title">Giriş Yap</div>
+            <div class="form-subtitle">Devam etmek için bilgilerini gir</div>
+
+            <form method="post">
+                <div class="mb-3">
+                    <label>Kullanıcı Adı</label> <input type="text" class="form-control" placeholder="johndoe123" asp-for="Username" required />
+                </div>
+
+                <div class="mb-3">
+                    <label>Şifre</label>
+                    <input type="password" class="form-control" placeholder="••••••••" asp-for="Password" required />
+                </div>
+
+                <div asp-validation-summary="ModelOnly" class="validation-box d-none"></div>
+
+                <button class="btn-login mt-2" type="submit">Giriş Yap</button>
+            </form>
+
+            <div class="register-link">
+                Hesabın yok mu? <a href="/Register/CreateUser">Kayıt Ol</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var validationBox = document.querySelector('.validation-box');
+            if (validationBox && validationBox.innerHTML.trim().length > 0) {
+                validationBox.classList.remove('d-none');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,543 @@
+﻿@model Project2EmailNight.Dtos.UserRegisterDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mail@@ | Kayıt Ol</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #10b981;
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e5e7eb;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #ede9fe, #f6f7fb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--card);
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(15, 23, 42, 0.08);
+        }
+
+    
+        .brand-side {
+            position: relative;
+            background-color: #f8fafc; 
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+            /* Pastel Renk Küreleri */
+            .brand-side::before,
+            .brand-side::after {
+                content: '';
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(60px);
+                z-index: -1;
+                animation: float 10s infinite ease-in-out alternate;
+            }
+
+            .brand-side::before {
+                top: -10%;
+                left: -10%;
+                width: 350px;
+                height: 350px;
+                background: rgba(124, 58, 237, 0.35); /* Soft Mor */
+            }
+
+            .brand-side::after {
+                bottom: -10%;
+                right: -10%;
+                width: 300px;
+                height: 300px;
+                background: rgba(16, 185, 129, 0.25); /* Soft Yeşil */
+                animation-delay: -5s;
+            }
+
+        @@keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(20px, 20px) scale(1.1);
+            }
+        }
+
+        .brand-content {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: var(--primary);
+            display: inline-block;
+        }
+
+        .brand-title {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            color: var(--text); /* Beyaz yazı yerine koyu metin */
+        }
+
+            .brand-title span {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+        .brand-desc {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 15px;
+            margin-bottom: 35px;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            color: #334155;
+            font-size: 14.5px;
+            font-weight: 600;
+        }
+
+        .feature-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 8px;
+            margin-right: 14px;
+            color: var(--secondary);
+        }
+
+            .feature-icon svg {
+                width: 14px;
+                height: 14px;
+            }
+
+        /* FORM TARAFI */
+        .form-side {
+            padding: 70px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--card);
+        }
+
+        .form-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+
+        .form-subtitle {
+            font-size: 15px;
+            color: var(--muted);
+            margin-bottom: 35px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            background: #f8fafc;
+            transition: all .25s ease;
+        }
+
+            .form-control:focus {
+                background: #ffffff;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+                outline: none;
+            }
+
+        .btn-register {
+            width: 100%;
+            border-radius: 16px;
+            padding: 15px;
+            font-weight: 700;
+            font-size: 15px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            transition: all .25s ease;
+            margin-top: 10px;
+        }
+
+            .btn-register:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 30px rgba(124, 58, 237, 0.25);
+                background: #6d28d9;
+            }
+
+        .terms {
+            font-size: 13.5px;
+            margin-top: 16px;
+            color: var(--muted);
+        }
+
+            .terms a {
+                color: var(--primary);
+                text-decoration: none;
+                font-weight: 600;
+                transition: all 0.2s ease;
+            }
+
+                .terms a:hover {
+                    color: #5b21b6;
+                    text-decoration: underline;
+                }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* MODAL TASARIMI */
+        .modal-backdrop.show {
+            opacity: 0.4;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .terms-modal {
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 50px 100px rgba(15, 23, 42, 0.15);
+            background: #ffffff;
+        }
+
+        .terms-header {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 30px 30px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .terms-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+        }
+
+            .terms-icon-wrapper svg {
+                width: 24px;
+                height: 24px;
+            }
+
+        .terms-header .modal-title {
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .btn-close-custom {
+            background: #f1f5f9;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+            .btn-close-custom:hover {
+                background: #e2e8f0;
+                color: #0f172a;
+            }
+
+        .terms-body {
+            padding: 30px;
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.8;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+            .terms-body p {
+                margin-bottom: 20px;
+            }
+
+            .terms-body ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .terms-body li {
+                position: relative;
+                padding-left: 36px;
+                margin-bottom: 16px;
+                font-weight: 500;
+                color: #334155;
+            }
+
+                .terms-body li::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 4px;
+                    width: 22px;
+                    height: 22px;
+                    background-color: rgba(16, 185, 129, 0.15);
+                    border-radius: 6px;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2310b981'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: 14px;
+                }
+
+        .terms-footer {
+            padding: 20px 30px 30px;
+            border-top: none;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-accept {
+            background: var(--text);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+            .btn-accept:hover {
+                background: var(--primary);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+            }
+
+        /* RESPONSIVE */
+        @@media (max-width: 992px) {
+            .register-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-side {
+                padding: 40px 20px;
+            }
+
+            .brand-content {
+                padding: 30px;
+            }
+
+            .form-side {
+                padding: 45px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-wrapper">
+
+        <div class="brand-side">
+            <div class="brand-content">
+                <div class="logo">Mail@@</div>
+
+                <div class="brand-title">
+                    Güvenli.<br />
+                    Hızlı.<br />
+                    <span>Modern.</span>
+                </div>
+
+                <div class="brand-desc">
+                    Mail@@ ile mesajlarını güvenli şekilde yönet, kategorilere ayır, yıldızla ve yeni nesil panel deneyimini hemen keşfet.
+                </div>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        Kategori & Etiket Sistemi
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        Yıldızlı Mesaj Yönetimi
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        Dashboard İstatistik Paneli
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-side">
+            <div class="form-title">Hesap Oluştur</div>
+            <div class="form-subtitle">Başlamak sadece 30 saniye sürer.</div>
+
+            <form method="post">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Ad</label>
+                        <input type="text" class="form-control" asp-for="Name" placeholder="John" />
+                        <span class="text-danger" asp-validation-for="Name"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Soyad</label>
+                        <input type="text" class="form-control" asp-for="Surname" placeholder="Doe" />
+                        <span class="text-danger" asp-validation-for="Surname"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label>Kullanıcı Adı</label>
+                    <input type="text" class="form-control" asp-for="Username" placeholder="johndoe123" />
+                    <span class="text-danger" asp-validation-for="Username"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label>Email Adresi</label>
+                    <input type="email" class="form-control" asp-for="Email" placeholder="ornek@mail.com" />
+                    <span class="text-danger" asp-validation-for="Email"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label>Şifre</label>
+                    <input type="password" class="form-control" asp-for="Password" placeholder="••••••••" />
+                    <span class="text-danger" asp-validation-for="Password"></span>
+                </div>
+
+                <div class="form-check terms mt-3">
+                    <input class="form-check-input" type="checkbox" asp-for="AcceptTerms" id="termsCheck" />
+                    <label class="form-check-label" for="termsCheck">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">
+                            Kullanım şartlarını ve gizlilik politikasını
+                        </a> kabul ediyorum
+                    </label>
+                    <span class="text-danger" asp-validation-for="AcceptTerms"></span>
+                </div>
+
+                <button class="btn-register" type="submit">Hemen Kayıt Ol</button>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content terms-modal">
+
+                <div class="modal-header terms-header">
+                    <div class="d-flex align-items-center w-100">
+                        <div class="terms-icon-wrapper">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </div>
+                        <h5 class="modal-title">Kullanım Şartları & Gizlilik</h5>
+                        <button type="button" class="btn-close-custom ms-auto" data-bs-dismiss="modal" aria-label="Kapat">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-body terms-body">
+                    <p><strong>Mail@@</strong> uygulamasına kayıt olarak aşağıdaki şartları kabul etmiş sayılırsınız. Verilerinizin güvenliği bizim için en büyük önceliktir.</p>
+                    <ul>
+                        <li>Kişisel bilgileriniz KVKK kapsamında güvenli şekilde saklanır.</li>
+                        <li>Spam veya kötüye kullanım durumunda hesap askıya alınabilir.</li>
+                        <li>Hesap güvenliği için email doğrulaması zorunludur.</li>
+                        <li>Verileriniz kesinlikle üçüncü şirketlerle veya reklam verenlerle paylaşılmaz.</li>
+                    </ul>
+                </div>
+
+                <div class="modal-footer terms-footer">
+                    <button type="button" class="btn-accept" data-bs-dismiss="modal">Anladım, Kabul Ediyorum</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>

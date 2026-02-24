@@ -1,0 +1,118 @@
+﻿@model Project2EmailNight.Entities.Message
+
+@{
+    ViewData["Title"] = "Taslak Düzenle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="compose-page">
+    <form method="post" asp-action="EditDraft" onsubmit="syncEditor()">
+
+        <input type="hidden" asp-for="MessageId" />
+
+        <div class="compose-wrapper">
+
+            <!-- HEADER -->
+            <div class="compose-header">
+                <div class="compose-title-pill">
+                    <i class="bx bx-edit"></i>
+                    Taslak Düzenle
+                </div>
+                <a asp-action="Draft">Kapat</a>
+            </div>
+
+            <!-- BODY -->
+            <div class="p-4 d-flex flex-column flex-grow-1">
+
+                <div class="field-row">
+                    <div class="field-label">Kime</div>
+                    <input class="field-input" asp-for="ReceiverEmail" required />
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Konu</div>
+                    <input class="field-input" asp-for="Subject" required />
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Kategori</div>
+                    <input class="field-input" asp-for="Category" />
+                </div>
+
+                <!-- TOOLBAR -->
+                <div class="editor-toolbar">
+                    <button type="button" onclick="format('bold')"><b>B</b></button>
+                    <button type="button" onclick="format('italic')"><i>I</i></button>
+                    <button type="button" onclick="format('underline')"><u>U</u></button>
+                    <button type="button" onclick="addLink()">🔗</button>
+                    <button type="button" onclick="insertEmoji()">😊</button>
+                </div>
+
+                <!-- EDITOR -->
+                <div id="editor" class="editor" contenteditable="true">
+                    @Html.Raw(Model.MessageDetail)
+                </div>
+
+                <input type="hidden" asp-for="MessageDetail" id="hiddenMessage" />
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="compose-footer">
+
+                <span class="compose-hint">
+                    Ctrl + Enter ile gönder
+                </span>
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            name="submitType"
+                            value="draft"
+                            class="btn btn-outline-secondary">
+                        Taslak Güncelle
+                    </button>
+
+                    <button type="submit"
+                            name="submitType"
+                            value="send"
+                            class="btn-send">
+                        Gönder
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function format(cmd){
+            document.execCommand(cmd,false,null);
+        }
+
+        function insertEmoji(){
+            const emoji = prompt("Emoji gir:");
+            if(emoji) document.execCommand("insertText",false,emoji);
+        }
+
+        function addLink(){
+            const url = prompt("Link gir:");
+            if(url) document.execCommand("createLink",false,url);
+        }
+
+        function syncEditor(){
+            document.getElementById("hiddenMessage").value =
+                document.getElementById("editor").innerHTML;
+        }
+
+        document.addEventListener("keydown",function(e){
+            if(e.ctrlKey && e.key==="Enter"){
+                document.querySelector("form").submit();
+            }
+        });
+    </script>
+}
